@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Ads — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .ads-container { margin: 40px auto; padding-bottom: 80px; }
+    
+    .ads-header { 
+      margin-bottom: 32px; 
+    }
+    
+    .ads-header h1 { font-size: 28px; margin-bottom: 16px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 32px;
+      border-bottom: 2px solid var(--bg-main);
+      margin-bottom: 32px;
+    }
+
+    .tab-btn {
+      padding: 12px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-light);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 4px;
+      right: -20px;
+      background: #ff5a5f;
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+    }
+
+    .ads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    /* Order Cards */
+    .order-card {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--bg-main);
+      padding-bottom: 16px;
+    }
+
+    .order-id { font-weight: 800; color: var(--primary); font-size: 14px; }
+    .order-date { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+    
+    .order-status {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .status-pending { background: #fffaf0; color: #9c4221; border: 1px solid #feebc8; }
+    .status-accepted, .status-approved { background: #e6fffa; color: #2c7a7b; border: 1px solid #b2f5ea; }
+    .status-delivered { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .status-rejected { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+
+    .order-body { display: flex; gap: 20px; }
+    .order-item-img { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; }
+    .order-item-info { flex: 1; }
+    .order-item-title { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+    .order-item-price { font-weight: 800; color: var(--secondary); font-size: 18px; }
+
+    .order-buyer-info {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .buyer-label { color: var(--text-light); font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+    .buyer-value { color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+
+    .order-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 12px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-accept { background: var(--secondary); color: white; }
+    .btn-reject { background: white; border-color: #feb2b2; color: #c53030; }
+    .btn-deliver { background: var(--primary); color: white; }
+
+    .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-action:disabled { background: #ccc; cursor: not-allowed; border-color: #ccc; }
+
+    .ad-card {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .ad-card:hover { 
+      box-shadow: var(--shadow-lg); 
+      transform: translateY(-4px);
+      border-color: var(--secondary);
+    }
+
+    .ad-img-box {
+      width: 100%;
+      height: 200px;
+      background: #f8f9fa;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ad-img-box img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      transition: transform 0.5s ease;
+    }
+
+    .ad-card:hover .ad-img-box img { transform: scale(1.05); }
+
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 5;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-active { background: #e6fffa; color: #2c7a7b; border: 1px solid #b2f5ea; }
+    .status-pending { background: #fffaf0; color: #9c4221; border: 1px solid #feebc8; }
+    .status-rejected { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+
+    .ad-content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .ad-price { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .ad-title { 
+      font-size: 15px; 
+      color: var(--text-main); 
+      margin-bottom: 12px; 
+      line-height: 1.5; 
+      font-weight: 600;
+      height: 45px; 
+      overflow: hidden; 
+      display: -webkit-box; 
+      -webkit-line-clamp: 2; 
+      -webkit-box-orient: vertical; 
+    }
+
+    .ad-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--bg-main);
+    }
+
+    .ad-footer {
+      padding: 12px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-view { 
+      font-weight: 700; 
+      font-size: 13px; 
+      color: var(--secondary); 
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-view:hover { color: var(--primary); text-decoration: underline; }
+    
+    .btn-del {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #feb2b2;
+      color: #e53e3e;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .btn-del:hover { background: #fff5f5; transform: scale(1.1); }
+
+    .empty-ads {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="container ads-container">
+    <div class="ads-header">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1>Seller Dashboard</h1>
+        <a href="/sell.html" class="btn btn-primary">+ Sell Item</a>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('ads')">My Advertisements</button>
+      <button class="tab-btn" onclick="switchTab('orders')">
+        Orders Received
+        <span class="tab-badge" id="orderCount" style="display:none;">0</span>
+      </button>
+    </div>
+
+    <div id="adsSection">
+      <div id="adsList" class="ads-grid">
+        <!-- Loading Spinner -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--secondary);"></i>
+        </div>
+      </div>
+    </div>
+
+    <div id="ordersSection" style="display:none;">
+      <div id="ordersList">
+        <!-- Orders will be injected here -->
+      </div>
+    </div>
+  </main>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    console.log("Seller Dashboard Loaded - v1.0.2");
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+    let currentTab = 'ads';
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
+      });
+      
+      document.getElementById('adsSection').style.display = tab === 'ads' ? 'block' : 'none';
+      document.getElementById('ordersSection').style.display = tab === 'orders' ? 'block' : 'none';
+      
+      if (tab === 'ads') loadMyAds();
+      else loadReceivedOrders();
+    }
+
+    async function loadMyAds() {
+      const list = document.getElementById('adsList');
+      try {
+        const r = await fetch('/api/user/items');
+        const d = await r.json();
+        
+        if (!d.success) {
+          if (r.status === 401) location.href = '/index.html';
+          return;
+        }
+
+        const items = d.items || [];
+        if (items.length === 0) {
+          list.innerHTML = `
+            <div class="empty-ads">
+              <i class="fas fa-bullhorn" style="font-size:64px; color:var(--border-light); margin-bottom:24px;"></i>
+              <h3>You haven't posted any ads yet</h3>
+              <p style="margin-bottom:24px;">Sell your unused books and gear to other students.</p>
+              <a href="/sell.html" class="btn btn-primary">Start Selling</a>
+            </div>
+          `;
+          return;
+        }
+
+        list.innerHTML = items.map(item => {
+          const img = (item.images && item.images.length) ? item.images[0] : '';
+          const status = (item.status || 'active').toLowerCase();
+          const price = Number(item.price).toLocaleString();
+          
+          return `
+            <div class="ad-card" id="ad-${item.id}">
+              <div class="ad-img-box">
+                <img src="${esc(img)}" onerror="this.src='/assets/placeholder.jpg'">
+                <span class="status-badge status-${status}">${status}</span>
+              </div>
+              <div class="ad-content">
+                <div class="ad-price">Rs ${price}</div>
+                <div class="ad-title">${esc(item.title)}</div>
+                <div class="ad-meta">
+                  <span><i class="fas fa-tag"></i> ${esc(item.category || 'General')}</span>
+                  <span><i class="far fa-clock"></i> ${item.datePosted ? new Date(item.datePosted).toLocaleDateString() : 'N/A'}</span>
+                </div>
+              </div>
+              <div class="ad-footer">
+                <a href="/item-detail.html?id=${item.id}" class="btn-view"><i class="far fa-eye"></i> View Details</a>
+                <button class="btn-del" onclick="deleteAd(${item.id})" title="Delete Ad">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        list.innerHTML = '<div class="empty-ads"><h3>Error loading ads</h3></div>';
+      }
+    }
+
+    async function loadReceivedOrders() {
+      const list = document.getElementById('ordersList');
+      list.innerHTML = '<div class="text-center" style="padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--secondary);"></i></div>';
+      
+      try {
+        const r = await fetch('/api/seller/orders');
+        const d = await r.json();
+        if (!d.success) return;
+
+        const orders = d.orders || [];
+        const pendingCount = orders.filter(o => o.status === 'pending').length;
+        const badge = document.getElementById('orderCount');
+        if (pendingCount > 0) {
+          badge.textContent = pendingCount;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+
+        if (orders.length === 0) {
+          list.innerHTML = `
+            <div class="empty-ads">
+              <i class="fas fa-shopping-basket" style="font-size:64px; color:var(--border-light); margin-bottom:24px;"></i>
+              <h3>No orders received yet</h3>
+              <p>When someone buys your item, it will appear here.</p>
+            </div>
+          `;
+          return;
+        }
+
+        list.innerHTML = orders.map(order => {
+          const item = order.items[0] || {};
+          const img = (item.images && item.images.length) ? item.images[0] : '/assets/placeholder.jpg';
+          const date = new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+          const displayStatus = order.status === 'accepted' ? 'APPROVED' : order.status.toUpperCase();
+          const statusClass = order.status === 'accepted' ? 'status-approved' : `status-${order.status}`;
+          
+          return `
+            <div class="order-card">
+              <div class="order-header">
+                <div>
+                  <div class="order-id">ORDER #${order.id}</div>
+                  <div class="order-date">${date}</div>
+                </div>
+                <span class="order-status ${statusClass}">${displayStatus}</span>
+              </div>
+              
+              <div class="order-body">
+                <img src="${esc(img)}" class="order-item-img" onerror="this.src='/assets/placeholder.jpg'">
+                <div class="order-item-info">
+                  <div class="order-item-title">${esc(item.title)}</div>
+                  <div class="order-item-price">Rs ${Number(order.total_price).toLocaleString()}</div>
+                </div>
+              </div>
+
+              <div class="order-buyer-info">
+                <div class="buyer-label">Buyer Details</div>
+                <div class="buyer-value">${esc(order.full_name)} (${esc(order.buyer_email)})</div>
+                <div class="buyer-label">Shipping Address</div>
+                <div class="buyer-value">${esc(order.address)}, ${esc(order.city)}</div>
+                <div class="buyer-label">Contact</div>
+                <div class="buyer-value">${esc(order.phone_number)}</div>
+                ${order.notes ? `
+                  <div class="buyer-label">Notes</div>
+                  <div class="buyer-value">${esc(order.notes)}</div>
+                ` : ''}
+              </div>
+
+              <div class="order-actions">
+                ${order.status === 'pending' ? `
+                  <button class="btn-action btn-accept" onclick="updateOrderStatus(${order.id}, 'accepted')">
+                    <i class="fas fa-check"></i> Accept Order
+                  </button>
+                  <button class="btn-action btn-reject" onclick="updateOrderStatus(${order.id}, 'rejected')">
+                    <i class="fas fa-times"></i> Reject
+                  </button>
+                ` : ''}
+                ${order.status === 'accepted' ? `
+                  <button class="btn-action btn-deliver" onclick="updateOrderStatus(${order.id}, 'delivered')">
+                    <i class="fas fa-truck"></i> Mark as Delivered
+                  </button>
+                ` : ''}
+                <button class="btn-action" style="background:#f0f2f3; color:var(--primary);" onclick="location.href='/my-chats.html?to=${order.user_id}&item=${item.item_id}'">
+                  <i class="fas fa-comments"></i> Chat with Buyer
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        list.innerHTML = '<div class="empty-ads"><h3>Error loading orders</h3></div>';
+      }
+    }
+
+    async function updateOrderStatus(id, status) {
+      const confirmMsg = {
+        'accepted': 'Accept this order? This will mark the item as sold and notify the buyer.',
+        'rejected': 'Reject this order? The buyer will be notified.',
+        'delivered': 'Mark this order as delivered?'
+      };
+      
+      if (!confirm(confirmMsg[status] || `Update order status to ${status}?`)) return;
+      
+      try {
+        const r = await fetch(`/api/orders/${id}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const d = await r.json();
+        if (d.success) {
+          loadReceivedOrders();
+        } else {
+          alert(d.error || 'Failed to update status');
+        }
+      } catch (e) {
+        alert('Network error');
+      }
+    }
+
+    async function deleteAd(id) {
+      if (!confirm("Permanently delete this advertisement?")) return;
+      try {
+        const r = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+        if ((await r.json()).success) {
+          document.getElementById(`ad-${id}`).style.opacity = '0.5';
+          loadMyAds();
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'orders') {
+        switchTab('orders');
+      } else {
+        loadMyAds();
+      }
+    });
+  </script>
+</body>
+</html>

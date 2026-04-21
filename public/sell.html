@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Your Ad — Kitaab Faroosh</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="/global.css" />
+    <style>
+        .sell-wrapper { max-width: 800px; margin: 40px auto; padding-bottom: 80px; }
+        
+        .sell-card {
+            background: var(--white);
+            border-radius: 4px;
+            border: 1px solid var(--border-light);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .sell-header { text-align: center; margin-bottom: 40px; }
+        .sell-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .sell-header p { color: var(--text-muted); }
+
+        .form-section { margin-bottom: 32px; }
+        .section-title { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--bg-main);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--primary); }
+        .form-group label span { color: #ff5a5f; }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-control:focus { box-shadow: inset 0 0 0 1px var(--primary); }
+
+        .upload-zone {
+            border: 2px dashed var(--border-light);
+            border-radius: 4px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f8f9fa;
+        }
+
+        .upload-zone:hover { border-color: var(--primary); background: #f0f2f3; }
+        .upload-zone i { font-size: 48px; color: var(--text-light); margin-bottom: 16px; }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-img {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover { background: #003d43; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
+        .error-msg { color: #ff5a5f; font-size: 12px; margin-top: 4px; display: none; }
+        .error-msg.show { display: block; }
+
+        .spinner-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+
+        /* Dynamic fields grid */
+        .dynamic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .dynamic-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <script src="/js/navbar.js" defer></script>
+    <script src="/js/pakistan-cities.js" defer></script>
+    
+    <div class="spinner-overlay" id="loader">
+        <i class="fas fa-circle-notch fa-spin" style="font-size: 48px; color: var(--primary);"></i>
+    </div>
+
+    <main class="container sell-wrapper">
+        <div class="sell-header">
+            <h1>POST YOUR AD</h1>
+            <p>Reach thousands of students across Pakistan</p>
+        </div>
+
+        <form id="sell-form" novalidate>
+            <!-- 1. Category & Type -->
+            <div class="sell-card">
+                <div class="section-title">SELECTED CATEGORY</div>
+                <div class="dynamic-grid">
+                    <div class="form-group">
+                        <label>Category <span>*</span></label>
+                        <select id="category" name="category" class="form-control">
+                            <option value="">Select Category</option>
+                            <option value="Books">Books</option>
+                            <option value="Notes">Notes</option>
+                            <option value="Past Papers">Past Papers</option>
+                            <option value="Uniform">Uniform</option>
+                            <option value="Gadgets">Gadgets</option>
+                            <option value="Study Material">Study Material</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="error-msg" id="err-category">Required field</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Institution Level <span>*</span></label>
+                        <select id="institution" name="institution_type" class="form-control">
+                            <option value="">Select Level</option>
+                            <option value="School">School</option>
+                            <option value="College">College</option>
+                            <option value="University">University</option>
+                        </select>
+                        <div class="error-msg" id="err-institution">Required field</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Details -->
+            <div class="sell-card">
+                <div class="section-title">INCLUDE SOME DETAILS</div>
+                <div class="form-group">
+                    <label>Ad title <span>*</span></label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="e.g. O-Level Physics Book" maxlength="70">
+                    <div class="error-msg" id="err-title">Title must be 5-70 characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description <span>*</span></label>
+                    <textarea id="description" name="description" class="form-control" rows="6" placeholder="Include condition, features, reason for selling..."></textarea>
+                    <div class="error-msg" id="err-description">Description must be at least 10 characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Condition <span>*</span></label>
+                    <div style="display:flex; gap:24px; padding-top:8px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="condition" value="Used" checked style="width:20px; height:20px; accent-color:var(--primary);"> Used
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="condition" value="New" style="width:20px; height:20px; accent-color:var(--primary);"> New
+                        </label>
+                    </div>
+                </div>
+
+                <div id="dynamic-fields" class="dynamic-grid"></div>
+            </div>
+
+            <!-- 3. Price & Location -->
+            <div class="sell-card">
+                <div class="section-title">SET A PRICE & LOCATION</div>
+                <div class="dynamic-grid">
+                    <div class="form-group">
+                        <label>Price (Rs) <span>*</span></label>
+                        <input type="number" id="price" name="price" class="form-control" placeholder="Enter amount">
+                        <div class="error-msg" id="err-price">Price is required</div>
+                    </div>
+                    <div class="form-group" style="position:relative;">
+                        <label>City <span>*</span></label>
+                        <input type="text" id="city" name="city" class="form-control" placeholder="Select city" readonly style="cursor:pointer; background:white;">
+                        <div id="cityList" style="position:absolute; top:100%; left:0; right:0; background:white; border:1px solid var(--border-light); border-radius:4px; box-shadow:var(--shadow-lg); display:none; z-index:100; max-height:250px; overflow-y:auto;">
+                            <div style="padding:12px; border-bottom:1px solid var(--border-light); position:sticky; top:0; background:white;">
+                                <input type="text" id="citySearch" placeholder="Search city..." class="form-control" style="padding:8px;">
+                            </div>
+                            <div id="cityOptions"></div>
+                        </div>
+                        <div class="error-msg" id="err-city">Select a city</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span>*</span></label>
+                    <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="03XXXXXXXXX">
+                    <div class="error-msg" id="err-phone_number">Valid phone number required</div>
+                </div>
+            </div>
+
+            <!-- 4. Photos -->
+            <div class="sell-card">
+                <div class="section-title">UPLOAD PHOTOS (Max 5)</div>
+                <div class="upload-zone" id="uploadArea">
+                    <input type="file" id="images" accept="image/*" multiple style="display:none">
+                    <i class="fas fa-camera"></i>
+                    <p>Add up to 5 photos to get more buyers</p>
+                    <small>JPG, PNG or WEBP format</small>
+                </div>
+                <div class="preview-grid" id="imgPreviews"></div>
+                <div class="error-msg" id="err-images" style="text-align:center; margin-top:12px;">At least 1 photo is required</div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Post Now</button>
+        </form>
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+    <script src="/js/footer.js" defer></script>
+
+    <script>
+        // Form State
+        let selectedFiles = [];
+        const form = document.getElementById('sell-form');
+        const loader = document.getElementById('loader');
+
+        // Auth Guard
+        (async () => {
+            try {
+                const r = await fetch('/session');
+                const d = await r.json();
+                if (!d.loggedIn) location.href = '/index.html?next=/sell.html';
+            } catch(e) { location.href = '/'; }
+        })();
+
+        // Category Dynamics
+        document.getElementById('category').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const container = document.getElementById('dynamic-fields');
+            container.innerHTML = '';
+            
+            if (val === 'Books') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Author Name</label><input type="text" name="author_name" class="form-control" placeholder="e.g. Robert Martin"></div>
+                    <div class="form-group"><label>Subject / Topic</label><input type="text" name="subject" class="form-control" placeholder="e.g. Computer Science"></div>
+                `;
+            } else if (val === 'Notes') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Class / Semester</label><input type="text" name="class_year" class="form-control" placeholder="e.g. 2nd Year, Semester 4"></div>
+                    <div class="form-group"><label>Subject</label><input type="text" name="subject" class="form-control" placeholder="e.g. Mathematics"></div>
+                `;
+            } else if (val === 'Uniform') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Size</label><input type="text" name="size" class="form-control" placeholder="e.g. Medium, 32, 14.5"></div>
+                    <div class="form-group"><label>Type</label><input type="text" name="uniform_type" class="form-control" placeholder="e.g. Shirt, Blazer, Tie"></div>
+                `;
+            } else if (val === 'Past Papers') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Year Range</label><input type="text" name="year_range" class="form-control" placeholder="e.g. 2018-2023"></div>
+                    <div class="form-group"><label>Board / University</label><input type="text" name="board" class="form-control" placeholder="e.g. FBISE, Punjab University"></div>
+                `;
+            } else if (val === 'Gadgets') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Brand</label><input type="text" name="brand" class="form-control" placeholder="e.g. Casio, HP, Dell"></div>
+                    <div class="form-group"><label>Specifications</label><input type="text" name="specifications" class="form-control" placeholder="e.g. Scientific, Core i5, 8GB RAM"></div>
+                `;
+            } else if (val === 'Study Material') {
+                container.innerHTML = `
+                    <div class="form-group"><label>Material Type</label><input type="text" name="material_type" class="form-control" placeholder="e.g. Lab Coat, Drawing Board"></div>
+                `;
+            }
+        });
+
+        // Image Handling
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('images');
+        const imgPreviews = document.getElementById('imgPreviews');
+
+        uploadArea.onclick = () => imageInput.click();
+        imageInput.onchange = () => {
+            const files = Array.from(imageInput.files);
+            const remaining = 5 - selectedFiles.length;
+            selectedFiles = [...selectedFiles, ...files.slice(0, remaining)];
+            renderPreviews();
+            imageInput.value = '';
+        };
+
+        function renderPreviews() {
+            imgPreviews.innerHTML = '';
+            selectedFiles.forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}">
+                        <button type="button" class="remove-img" onclick="removeImg(${i})"><i class="fas fa-times"></i></button>
+                    `;
+                    imgPreviews.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.removeImg = (i) => {
+            selectedFiles.splice(i, 1);
+            renderPreviews();
+        };
+
+        // City Search
+        const cityInput = document.getElementById('city');
+        const cityList = document.getElementById('cityList');
+        const citySearch = document.getElementById('citySearch');
+        const cityOptions = document.getElementById('cityOptions');
+
+        cityInput.onclick = () => {
+            cityList.style.display = 'block';
+            citySearch.focus();
+            renderCities();
+        };
+
+        citySearch.oninput = (e) => renderCities(e.target.value);
+
+        function renderCities(filter = '') {
+            cityOptions.innerHTML = '';
+            const cities = (window.pakistanCities || []).filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+            cities.forEach(c => {
+                const btn = document.createElement('div');
+                btn.style.cssText = "padding:12px; cursor:pointer; font-size:14px;";
+                btn.textContent = c;
+                btn.onclick = () => {
+                    cityInput.value = c;
+                    cityList.style.display = 'none';
+                };
+                btn.onmouseover = () => btn.style.background = "#f2f4f5";
+                btn.onmouseout = () => btn.style.background = "transparent";
+                cityOptions.appendChild(btn);
+            });
+        }
+
+        document.onclick = (e) => { if (!e.target.closest('#city')) cityList.style.display = 'none'; };
+
+        // Submission
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // Basic Validation
+            let valid = true;
+            ['category', 'institution', 'title', 'description', 'price', 'city', 'phone_number'].forEach(id => {
+                const el = document.getElementById(id);
+                const err = document.getElementById('err-'+id);
+                if (!el.value) { err.classList.add('show'); valid = false; }
+                else err.classList.remove('show');
+            });
+
+            if (selectedFiles.length === 0) {
+                document.getElementById('err-images').classList.add('show');
+                valid = false;
+            } else {
+                document.getElementById('err-images').classList.remove('show');
+            }
+
+            if (!valid) return;
+
+            loader.style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const fd = new FormData(form);
+                fd.delete('images');
+                selectedFiles.forEach(f => fd.append('images', f));
+
+                const res = await fetch('/api/items', { method: 'POST', body: fd });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('Ad posted successfully! It will be live after admin approval.');
+                    location.href = '/my-ads.html';
+                } else {
+                    alert(data.error || 'Failed to post ad');
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            } catch(e) {
+                alert('Connection error');
+                document.getElementById('submitBtn').disabled = false;
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>

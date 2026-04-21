@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Favorites — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .fav-container { margin: 40px auto; padding-bottom: 80px; }
+    
+    .fav-header { margin-bottom: 32px; }
+    .fav-header h1 { font-size: 28px; margin-bottom: 8px; }
+    .fav-header p { color: var(--text-muted); }
+
+    .fav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .empty-fav {
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      grid-column: 1 / -1;
+    }
+
+    /* Reuse home.html favorite button styles but localized */
+    .fav-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      color: #ff5a5f;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .fav-btn:hover { transform: scale(1.1); }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="container fav-container">
+    <div class="fav-header">
+      <h1>Saved Items</h1>
+      <p id="favCountLabel">0 items in your favorites</p>
+    </div>
+
+    <div id="favList" class="fav-grid">
+      <!-- Items Injected Here -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--secondary);"></i>
+      </div>
+    </div>
+  </main>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    
+    function timeAgo(d){
+      const now=new Date(), p=new Date(d), ms=now-p, m=Math.floor(ms/60000);
+      if(m<60) return m<=1?'Just now':`${m}m ago`;
+      const h=Math.floor(m/60); if(h<24) return`${h}h ago`;
+      const days=Math.floor(h/24); if(days<30) return`${days}d ago`;
+      return p.toLocaleDateString();
+    }
+
+    async function loadFavorites() {
+      const list = document.getElementById('favList');
+      try {
+        const r = await fetch('/api/favorites');
+        const d = await r.json();
+        if(!d.success) return;
+
+        const items = d.items || [];
+        document.getElementById('favCountLabel').textContent = `${items.length} item${items.length===1?'':'s'} saved`;
+
+        if(items.length === 0) {
+          list.innerHTML = `
+            <div class="empty-fav">
+              <i class="far fa-heart" style="font-size:64px; color:var(--border-light); margin-bottom:24px;"></i>
+              <h3>No saved items yet</h3>
+              <p style="margin-bottom:24px;">Save items you're interested in to view them later.</p>
+              <a href="/home.html" class="btn btn-primary">Discover Items</a>
+            </div>
+          `;
+          return;
+        }
+
+        list.innerHTML = items.map(i => {
+          const img = (i.images && i.images.length) ? i.images[0] : '';
+          const price = Number(i.price || 0).toLocaleString();
+          
+          return `
+            <div class="item-card" id="fav-${i.id}" onclick="if(!event.target.closest('.fav-btn')) window.location.href='/item-detail.html?id=${i.id}'">
+              <div class="item-img-wrap">
+                ${img ? `<img src="${img}" alt="${esc(i.title)}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:#ddd;"><i class="fas fa-camera"></i></div>'}
+                <button class="fav-btn" onclick="removeFavorite(event, ${i.id})" title="Remove from favorites">
+                  <i class="fas fa-heart"></i>
+                </button>
+              </div>
+              <div class="item-info">
+                <div class="item-price">Rs ${price}</div>
+                <div class="item-title">${esc(i.title)}</div>
+                <div class="item-location-date">
+                  <span><i class="fas fa-map-marker-alt"></i> ${esc(i.city || 'Pakistan')}</span>
+                  <span>${timeAgo(i.datePosted)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch(e) {
+        list.innerHTML = '<div class="empty-fav"><h3>Error loading favorites</h3><p>Please try again later.</p></div>';
+      }
+    }
+
+    async function removeFavorite(event, id) {
+      event.preventDefault();
+      event.stopPropagation();
+      if(!confirm('Remove from favorites?')) return;
+      
+      try {
+        const r = await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
+        if((await r.json()).success) {
+          const card = document.getElementById(`fav-${id}`);
+          card.style.opacity = '0.5';
+          loadFavorites();
+        }
+      } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFavorites);
+  </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>School Marketplace — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .category-header {
+      background: var(--white);
+      padding: 40px 0;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 32px;
+    }
+    .category-header h1 { font-size: 32px; margin-bottom: 8px; }
+    .category-header p { color: var(--text-muted); font-size: 16px; }
+
+    .fav-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      color: var(--text-light);
+      transition: var(--transition);
+      z-index: 10;
+    }
+    .fav-btn:hover { transform: scale(1.1); }
+    .fav-btn.active { color: #ff5a5f; }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+  <script src="/js/pakistan-cities.js" defer></script>
+  <script src="/js/item-filters.js" defer></script>
+
+  <section class="category-header">
+    <div class="container">
+      <h1>School Materials</h1>
+      <p>Books, uniforms, and stationary for school students.</p>
+    </div>
+  </section>
+
+  <main class="container" style="padding-bottom: 80px;">
+    <div id="filterMount"></div>
+    
+    <div id="itemsGrid" class="items-grid">
+      <!-- Loader -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--secondary);"></i>
+      </div>
+    </div>
+  </main>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    let userFavoriteIds = [];
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function getTimeAgo(dateString) {
+      const now = new Date();
+      const posted = new Date(dateString);
+      const diffMs = now - posted;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 60) return diffMins <= 1 ? 'Just now' : `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return posted.toLocaleDateString();
+    }
+
+    async function fetchUserFavorites() {
+      try {
+        const res = await fetch('/api/favorites/check');
+        const data = await res.json();
+        if (data.success) userFavoriteIds = data.favoriteIds || [];
+      } catch (e) {}
+    }
+
+    function renderItemsGrid(items) {
+      const grid = document.getElementById('itemsGrid');
+      if (!grid) return;
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 80px 0;">
+            <i class="fas fa-search" style="font-size: 48px; color: var(--border-light); margin-bottom: 16px;"></i>
+            <h3 style="color: var(--text-muted);">No items found in School</h3>
+            <p style="color: var(--text-light);">Try adjusting your filters or search terms.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(i => {
+        const img = (Array.isArray(i.images) && i.images[0]) || '';
+        const price = Number(i.price || 0).toLocaleString();
+        const isFav = userFavoriteIds.includes(i.id);
+        
+        return `
+          <div class="item-card" onclick="if(!event.target.closest('.fav-btn')) window.location.href='/item-detail.html?id=${i.id}'">
+            <div class="item-img-wrap">
+              ${img ? `<img src="${img}" alt="${escapeHtml(i.title)}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:#ddd;"><i class="fas fa-camera"></i></div>'}
+              <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, ${i.id})">
+                <i class="${isFav ? 'fas fa-heart' : 'far fa-heart'}"></i>
+              </button>
+            </div>
+            <div class="item-info">
+              <div class="item-price">Rs ${price}</div>
+              <div class="item-title">${escapeHtml(i.title)}</div>
+              <div class="item-location-date">
+                <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(i.city || 'Pakistan')}</span>
+                <span>${getTimeAgo(i.datePosted)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleFavorite(event, itemId) {
+      event.preventDefault(); event.stopPropagation();
+      const btn = event.currentTarget;
+      const isCurrentlyFav = btn.classList.contains('active');
+      try {
+        const url = isCurrentlyFav ? `/api/favorites/${itemId}` : '/api/favorites';
+        const method = isCurrentlyFav ? 'DELETE' : 'POST';
+        const r = await fetch(url, { 
+          method, 
+          headers: {'Content-Type':'application/json'},
+          body: isCurrentlyFav ? null : JSON.stringify({ item_id: itemId })
+        });
+        if ((await r.json()).success) {
+          btn.classList.toggle('active');
+          btn.querySelector('i').className = btn.classList.contains('active') ? 'fas fa-heart' : 'far fa-heart';
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      await fetchUserFavorites();
+      if (window.initFilters) {
+        window.initFilters('filterMount', 'School', renderItemsGrid);
+      }
+    });
+  </script>
+</body>
+</html>

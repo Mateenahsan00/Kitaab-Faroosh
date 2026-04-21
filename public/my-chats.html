@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Chats — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .chat-page { 
+      height: calc(100vh - 72px); 
+      background: var(--bg-main);
+      padding: 20px 0;
+    }
+
+    .chat-window {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      background: var(--white);
+      height: 100%;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Sidebar */
+    .chat-sidebar {
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      background: #f8f9fa;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      background: white;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .sidebar-header h2 { font-size: 20px; }
+
+    .convo-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .convo-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      transition: var(--transition);
+      background: #f8f9fa;
+    }
+
+    .convo-item:hover { background: white; }
+    .convo-item.active { background: white; border-left: 4px solid var(--secondary); }
+
+    .convo-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #eee;
+    }
+
+    .convo-info { flex: 1; min-width: 0; }
+    .convo-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .convo-name { font-weight: 700; color: var(--primary); font-size: 15px; }
+    .convo-time { font-size: 11px; color: var(--text-light); }
+    .convo-item-title { font-size: 12px; color: var(--secondary); font-weight: 700; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .convo-preview { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .convo-item.unread .convo-preview { font-weight: 800; color: var(--primary); }
+
+    /* Main Chat Area */
+    .chat-main { display: flex; flex-direction: column; position: relative; }
+
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-light);
+      padding: 40px;
+    }
+
+    .chat-header {
+      padding: 12px 24px;
+      background: white;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .partner-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+    .partner-info h3 { font-size: 16px; margin: 0; }
+    .partner-info a { font-size: 13px; color: var(--secondary); font-weight: 600; text-decoration: underline; }
+
+    .chat-body {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .msg-group { display: flex; flex-direction: column; max-width: 70%; }
+    .msg-group.sent { align-self: flex-end; align-items: flex-end; }
+    .msg-group.received { align-self: flex-start; align-items: flex-start; }
+
+    .msg-bubble {
+      padding: 10px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sent .msg-bubble { background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+    .received .msg-bubble { background: white; color: var(--primary); border-bottom-left-radius: 2px; }
+
+    .msg-time { font-size: 10px; color: var(--text-light); margin-top: 4px; font-weight: 700; }
+
+    .chat-footer {
+      padding: 20px 24px;
+      background: white;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .input-box {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #f0f2f3;
+      padding: 8px 16px;
+      border-radius: 24px;
+    }
+
+    .chat-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .btn-send {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .btn-send:hover { transform: scale(1.1); }
+
+    @media (max-width: 800px) {
+      .chat-window { grid-template-columns: 1fr; }
+      .chat-sidebar { display: none; }
+      .chat-sidebar.active { display: flex; }
+      .chat-main { display: none; }
+      .chat-main.active { display: flex; }
+    }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="chat-page">
+    <div class="container" style="height: 100%;">
+      <div class="chat-window">
+        <!-- Sidebar -->
+        <aside class="chat-sidebar" id="sidebar">
+          <div class="sidebar-header">
+            <h2>Messages</h2>
+          </div>
+          <div class="convo-list" id="convoList">
+            <div style="padding:40px; text-align:center; color:var(--text-light);">Loading conversations...</div>
+          </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="chat-main" id="chatMain">
+          <div id="emptyChat" class="chat-empty">
+            <i class="far fa-comments" style="font-size: 64px; margin-bottom: 16px;"></i>
+            <h3>Select a chat to view messages</h3>
+          </div>
+
+          <div id="activeChat" style="display:none; flex-direction:column; height:100%;">
+            <div class="chat-header">
+               <button onclick="showSidebar()" style="display:none; border:none; background:none; font-size:20px;" class="mobile-only"><i class="fas fa-arrow-left"></i></button>
+               <img src="" id="headerPartnerPic" class="partner-avatar" alt="">
+               <div class="partner-info">
+                 <h3 id="headerPartnerName">...</h3>
+                 <a href="#" id="headerItemLink" target="_blank">...</a>
+               </div>
+            </div>
+
+            <div class="chat-body" id="chatBody"></div>
+
+            <div class="chat-footer">
+              <div class="input-box">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Write a message..." autocomplete="off">
+                <button id="sendBtn" class="btn-send">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket, me = null, activeId = null, partnerId = null, convos = [];
+
+    const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function formatTime(iso) {
+      if(!iso) return '';
+      const d = new Date(iso), now = new Date();
+      if(d.toDateString() === now.toDateString()) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    async function loadConversations() {
+      try {
+        const r = await fetch('/api/conversations');
+        const d = await r.json();
+        if(d.success) {
+          convos = d.conversations || [];
+          renderConvoList();
+        }
+      } catch (e) {}
+    }
+
+    function renderConvoList() {
+      const list = document.getElementById('convoList');
+      if(convos.length === 0) {
+        list.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-light);">No chats yet.</div>`;
+        return;
+      }
+      list.innerHTML = convos.map(c => {
+        const active = c.id === activeId ? 'active' : '';
+        const unread = (c.unread_count > 0 && c.id !== activeId) ? 'unread' : '';
+        const pic = c.other_pic || (`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(c.other_name)}`);
+        return `
+          <div class="convo-item ${active} ${unread}" onclick="switchChat(${c.id})">
+            <img src="${pic}" class="convo-avatar">
+            <div class="convo-info">
+              <div class="convo-top">
+                <span class="convo-name">${esc(c.other_name)}</span>
+                <span class="convo-time">${formatTime(c.last_message_time)}</span>
+              </div>
+              <div class="convo-item-title">${esc(c.item_title)}</div>
+              <div class="convo-preview">${esc(c.last_message || 'New conversation')}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function switchChat(id) {
+      activeId = id;
+      const convo = convos.find(c => c.id === id);
+      if(!convo) return;
+      convo.unread_count = 0;
+      renderConvoList();
+
+      document.getElementById('emptyChat').style.display = 'none';
+      document.getElementById('activeChat').style.display = 'flex';
+      
+      document.getElementById('headerPartnerName').textContent = convo.other_name;
+      document.getElementById('headerPartnerPic').src = convo.other_pic || (`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(convo.other_name)}`);
+      document.getElementById('headerItemLink').textContent = convo.item_title;
+      document.getElementById('headerItemLink').href = `/item-detail.html?id=${convo.item_id}`;
+      
+      partnerId = convo.other_user;
+
+      try {
+        const r = await fetch(`/api/messages/${id}`);
+        const d = await r.json();
+        if(d.success) {
+          renderMessages(d.messages);
+          socket.emit('mark_read', { conversation_id: id });
+          if (window.updateGlobalChatBadge) window.updateGlobalChatBadge();
+        }
+      } catch (e) {}
+    }
+
+    function renderMessages(msgs) {
+      const body = document.getElementById('chatBody');
+      body.innerHTML = msgs.map(m => {
+        const isSent = m.sender_id === me.id;
+        return `
+          <div class="msg-group ${isSent ? 'sent' : 'received'}">
+            <div class="msg-bubble">${esc(m.message_text)}</div>
+            <span class="msg-time">${formatTime(m.created_at)}</span>
+          </div>
+        `;
+      }).join('');
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function handleSend() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if(!text || !activeId || !partnerId) return;
+
+      socket.emit('send_message', { conversation_id: activeId, receiver_id: partnerId, message_text: text });
+      
+      const body = document.getElementById('chatBody');
+      body.insertAdjacentHTML('beforeend', `<div class="msg-group sent"><div class="msg-bubble">${esc(text)}</div><span class="msg-time">${formatTime(new Date())}</span></div>`);
+      body.scrollTop = body.scrollHeight;
+      input.value = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const s = await (await fetch('/session')).json();
+      if(!s.loggedIn) { location.href = '/index.html'; return; }
+      me = s.user;
+
+      socket = io();
+      socket.emit('register', me.id);
+      socket.on('receive_message', (data) => {
+        if(Number(data.conversation_id) === activeId) {
+          const body = document.getElementById('chatBody');
+          body.insertAdjacentHTML('beforeend', `<div class="msg-group received"><div class="msg-bubble">${esc(data.message_text)}</div><span class="msg-time">${formatTime(data.created_at)}</span></div>`);
+          body.scrollTop = body.scrollHeight;
+          socket.emit('mark_read', { conversation_id: activeId });
+          if (window.updateGlobalChatBadge) window.updateGlobalChatBadge();
+        } else {
+          loadConversations();
+        }
+      });
+
+      await loadConversations();
+      
+      const url = new URL(location.href);
+      const to = url.searchParams.get('to'), item = url.searchParams.get('item');
+      const chatId = url.searchParams.get('chatId');
+      
+      if(to) {
+        socket.emit('start_chat', { sellerId: Number(to), itemId: item ? Number(item) : null }, async (resp) => {
+          if(resp.success) {
+            await loadConversations();
+            switchChat(resp.conversation_id);
+          }
+        });
+      } else if (chatId) {
+        switchChat(Number(chatId));
+      }
+
+      document.getElementById('sendBtn').onclick = handleSend;
+      document.getElementById('chatInput').onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FAQ — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .faq-wrapper {
+      max-width: 800px;
+      margin: 60px auto 100px;
+      padding: 0 20px;
+    }
+
+    .faq-header { text-align: center; margin-bottom: 48px; }
+    .faq-header h1 { font-size: 40px; margin-bottom: 12px; }
+    .faq-header p { color: var(--text-muted); font-size: 16px; }
+
+    .faq-category {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 40px 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--bg-main);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .faq-item {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .faq-item:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+    .faq-question {
+      width: 100%;
+      padding: 20px 24px;
+      text-align: left;
+      background: none;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--primary);
+      outline: none;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background: #f8f9fa;
+    }
+
+    .faq-answer-inner {
+      padding: 24px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      border-top: 1px solid var(--border-light);
+      font-size: 15px;
+    }
+
+    .faq-item.active .faq-question { background: var(--bg-main); }
+    .faq-item.active .faq-answer { max-height: 500px; }
+    
+    .faq-icon {
+      font-size: 14px;
+      transition: transform 0.3s ease;
+      color: var(--text-light);
+    }
+    .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--primary); }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="faq-wrapper">
+    <div class="faq-header">
+      <h1>Frequently Asked Questions</h1>
+      <p>Everything you need to know about Kitaab Faroosh.</p>
+    </div>
+
+    <div class="faq-category">General & Account</div>
+    <div class="faq-item">
+      <button class="faq-question">What is Kitaab Faroosh? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Kitaab Faroosh is Pakistan's premier campus marketplace. It allows students to buy and sell educational materials like books, notes, and uniforms directly within their own institutions, making it safer and more convenient than general marketplaces.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Is it free to use? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Yes! Posting ads and browsing items is completely free for students. We don't charge any commission on sales or listing fees. Our mission is to make education more affordable and accessible by facilitating the reuse of study materials.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How do I create an account? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Simply click the "Sign Up" button on the homepage. You'll need to provide your full name, a valid email address, your institution name, and a secure password. Once registered, you can start listing items or chatting with sellers immediately.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Can I change my profile information later? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Yes, you can update your profile at any time. Go to your Dashboard, click on "Edit Profile" to change your name, phone number, city, or profile picture. Keeping your profile updated helps build trust with other students.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">I forgot my password. How can I reset it? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Click "Forgot Password" on the login screen. Enter your registered email address, and we'll send you a 6-digit OTP code. Enter the OTP to verify your identity, then create a new password. The OTP expires in 10 minutes for security. If you don't receive the email, check your spam folder.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How do I delete my account? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">If you wish to delete your account permanently, please contact our support team via the "Contact Us" page. Note that this action cannot be undone, and all your active listings will be removed. We recommend downloading any important data before requesting account deletion.</div></div>
+    </div>
+
+    <div class="faq-category">Buying & Selling</div>
+    <div class="faq-item">
+      <button class="faq-question">How do I post an ad? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Click the "+ SELL" button in the navbar. Select the appropriate category (Books, Notes, etc.), choose your institution level (School, College, University), and fill in the details. You can upload up to 5 clear photos of the item. After clicking "Post Now", our team will review your ad to ensure it meets community guidelines before it goes live.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">What details should I include in my ad? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">For the best results, include the condition of the item (New/Used), the original price vs. your selling price, and a detailed description. For books, mention the author and edition. For uniforms, specify the size and institute name. Clear, well-lit photos significantly increase your chances of a quick sale.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How can I contact a seller? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">You can use our built-in real-time chat system by clicking "Chat with Seller" on any item page. This allows you to ask questions and negotiate without sharing your personal contact details immediately. You can also view the seller's phone number if they have chosen to make it public.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Can I negotiate the price? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Absolutely! Most sellers are open to reasonable negotiations. Use the chat feature to discuss pricing. Be respectful and fair in your offers. Remember, the goal is to make education affordable for everyone while ensuring sellers get fair value for their items.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How long does my ad stay active? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Your ad remains active until the item is sold or you manually deactivate it from your "My Ads" dashboard. If your item sells, please mark it as sold promptly so other buyers know it's no longer available. Inactive ads may be removed after 30 days.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Why was my ad rejected or removed? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Ads may be rejected if they contain inappropriate content, misleading information, prohibited items, or poor quality images. We review all ads to maintain quality standards. If your ad was rejected, you'll receive a notification explaining the reason. You can edit and resubmit it following our guidelines.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">What items are prohibited on Kitaab Faroosh? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">We only allow items related to education and student life. Prohibited items include illegal materials, pirated software, non-educational electronics, weapons, or any items that violate Pakistani law. We also prohibit misleading or deceptive advertisements.</div></div>
+    </div>
+
+    <div class="faq-category">Safety & Trust</div>
+    <div class="faq-item">
+      <button class="faq-question">Is it safe to meet sellers? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Safety is our top priority. We highly recommend meeting in safe, public locations—ideally on your campus during daylight hours. Bringing a friend along is always a good idea. Never share sensitive personal information or financial details over chat.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How should I handle payments? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">We strongly advise against paying in advance. Always inspect the item thoroughly to ensure it matches the description before handing over any money. Cash on delivery in a public place is the safest method for both parties.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">What if I receive a damaged or different item? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">If the item you receive doesn't match the listing description, contact the seller immediately through chat to resolve the issue. If they're unresponsive or uncooperative, report the incident via "Contact Us" with screenshots. We recommend inspecting items before payment to avoid this situation.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">What if I encounter a suspicious user or scam? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">If you find a suspicious ad or a user behaving inappropriately, please report it immediately via the "Contact Us" page. Provide as much detail as possible. We take all reports seriously and will take action, including banning users who violate our community trust.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How does Kitaab Faroosh protect my data? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">We use industry-standard security measures including password encryption (bcrypt) and secure sessions. Your personal information is never shared with third parties without consent. We encourage users to keep their contact details private until they're comfortable sharing them with verified buyers/sellers.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Are there any red flags I should watch for? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Be cautious of: (1) Users asking for advance payment before meeting, (2) Prices that seem too good to be true, (3) Requests for personal banking details, (4) Pressure tactics to make quick decisions, (5) Users refusing to meet in person. When in doubt, trust your instincts and report suspicious behavior.</div></div>
+    </div>
+
+    <div class="faq-category">Technical Support</div>
+    <div class="faq-item">
+      <button class="faq-question">The website isn't loading properly. What should I do? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Try clearing your browser cache and cookies, then refresh the page. Ensure you're using a modern browser (Chrome, Firefox, Safari, Edge). If the issue persists, check your internet connection or try accessing from a different device. You can also report technical issues via "Contact Us".</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Why aren't my images uploading? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Image uploads may fail if: (1) The file size is too large (max 5MB per image), (2) The file format isn't supported (JPG, PNG, JPEG, WEBP), (3) Your internet connection is unstable. Try compressing the image or using a different format. Make sure you're uploading clear, relevant photos of your item.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Can I use Kitaab Faroosh on my phone? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">Yes! Our website is fully responsive and works great on mobile devices. Simply open your browser and visit kitaabfaroosh.com. You can browse, post ads, chat with users, and manage your account—all from your smartphone. No app download required!</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">I didn't receive the OTP email. What now? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">First, check your spam/junk folder. Email providers sometimes filter automated messages. If it's not there, wait 2-3 minutes and try requesting the OTP again. Ensure you're entering the correct email address associated with your account. If you still don't receive it after multiple attempts, contact support.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How do I contact customer support? <i class="fas fa-chevron-down faq-icon"></i></button>
+      <div class="faq-answer"><div class="faq-answer-inner">You can reach us through the "Contact Us" page with any questions, concerns, or feedback. We also monitor our social media channels on Facebook, WhatsApp, and X (Twitter). Our team typically responds within 24-48 hours during business days.</div></div>
+    </div>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.faq-item').forEach(item => {
+        item.querySelector('.faq-question').addEventListener('click', () => {
+          const isActive = item.classList.contains('active');
+          document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+          if (!isActive) item.classList.add('active');
+        });
+      });
+    });
+  </script>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Kitaab Faroosh — Pakistan's Professional Campus Marketplace</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="128x128" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    /* Hero Section - Restored Original Layout */
+    .hero-banner {
+      background: linear-gradient(rgba(0, 47, 52, 0.7), rgba(0, 47, 52, 0.7)), url('/banner.png');
+      background-size: cover;
+      background-position: center;
+      padding: 100px 0;
+      text-align: center;
+      color: white;
+      margin-bottom: 0;
+    }
+
+    .hero-banner h1 {
+      color: white;
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Category Quick Links */
+    .cat-bar {
+      background: var(--white);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cat-list {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .cat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      min-width: 90px;
+      transition: var(--transition);
+    }
+
+    .cat-icon {
+      width: 64px;
+      height: 64px;
+      background: #f8f9fa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      transition: var(--transition);
+      border: 1px solid var(--border-light);
+    }
+
+    .cat-item:hover .cat-icon {
+      background: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .cat-item:hover { color: var(--secondary); }
+
+    /* Auth Modals (OLX Style) */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 47, 52, 0.85);
+      display: none; align-items: center; justify-content: center; z-index: 2000;
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay.active { display: flex; }
+
+    .auth-card {
+      background: var(--white);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      position: relative;
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    .modal-close {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 24px; cursor: pointer; color: var(--text-light);
+      transition: var(--transition);
+    }
+    .modal-close:hover { color: var(--danger); }
+
+    .auth-header { text-align: center; margin-bottom: 32px; }
+    .auth-header img { height: 60px; margin-bottom: 16px; }
+    .auth-header h2 { font-size: 24px; color: var(--primary); }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 8px; color: var(--primary); text-transform: uppercase; }
+    
+    .auth-input {
+      width: 100%; padding: 14px 16px; border: 1px solid var(--border-light);
+      border-radius: 4px; font-size: 15px; outline: none; transition: var(--transition);
+    }
+    .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+
+    .btn-auth {
+      width: 100%; padding: 16px; background: var(--primary); color: white;
+      border: none; border-radius: 4px; font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: var(--transition); margin-top: 10px;
+    }
+    .btn-auth:hover { background: #003d43; transform: translateY(-1px); }
+
+    .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+    .auth-footer a { color: var(--secondary); font-weight: 700; text-decoration: underline; }
+
+    .error-box {
+      background: #fff5f5; border: 1px solid #feb2b2; color: #c53030;
+      padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px;
+      font-weight: 600; display: none;
+    }
+
+    .success-box {
+      background: #f0fff4; border: 1px solid #9ae6b4; color: #276749;
+      padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px;
+      font-weight: 600; display: none;
+    }
+
+    .fav-btn {
+      position: absolute; top: 12px; right: 12px; width: 36px; height: 36px;
+      background: white; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; border: none; cursor: pointer;
+      box-shadow: var(--shadow-sm); color: var(--text-light); transition: var(--transition); z-index: 10;
+    }
+    .fav-btn:hover { transform: scale(1.1); }
+    .fav-btn.active { color: #ff5a5f; }
+
+    @media (max-width: 768px) {
+      .hero-banner h1 { font-size: 32px; }
+      .cat-list { gap: 24px; justify-content: flex-start; padding-left: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Scripts -->
+  <script src="/js/navbar.js" defer></script>
+  <script src="/js/pakistan-cities.js" defer></script>
+  <script src="/js/item-filters.js" defer></script>
+
+  <!-- Hero Section (Restored Original) -->
+  <section class="hero-banner">
+    <div class="container">
+      <h1>Find Books & Study Gear on Your Campus</h1>
+      <div id="filterMount"></div>
+    </div>
+  </section>
+
+  <!-- Category Bar -->
+  <div class="cat-bar">
+    <div class="container">
+      <div class="cat-list">
+        <a href="/index.html?institution=University" class="cat-item">
+          <div class="cat-icon">🎓</div>
+          <span>University</span>
+        </a>
+        <a href="/index.html?institution=College" class="cat-item">
+          <div class="cat-icon">🏫</div>
+          <span>College</span>
+        </a>
+        <a href="/index.html?institution=School" class="cat-item">
+          <div class="cat-icon">🎒</div>
+          <span>School</span>
+        </a>
+        <a href="/index.html?category=Books" class="cat-item">
+          <div class="cat-icon">📚</div>
+          <span>Books</span>
+        </a>
+        <a href="/index.html?category=Notes" class="cat-item">
+          <div class="cat-icon">📝</div>
+          <span>Notes</span>
+        </a>
+        <a href="/index.html?category=Accessories" class="cat-item">
+          <div class="cat-icon">📎</div>
+          <span>Stationery</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="padding-bottom: 80px; min-height: 400px;">
+    <!-- Latest Items -->
+    <section class="mt-20">
+      <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--primary);">Fresh Recommendations</h2>
+        <a href="/index.html" style="font-size: 14px; font-weight: 700; color: var(--secondary); text-decoration: underline;">View all</a>
+      </div>
+      <div id="itemsGrid" class="items-grid">
+        <!-- Skeleton Loader -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+          <i class="fas fa-circle-notch fa-spin" style="font-size: 32px; color: var(--secondary);"></i>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth Modals -->
+  <div id="loginModal" class="modal-overlay">
+    <div class="auth-card">
+      <i class="fas fa-times modal-close" onclick="closeAuthModal()"></i>
+      <div class="auth-header">
+        <img src="/assets/logo.png" alt="Logo">
+        <h2>Welcome Back</h2>
+      </div>
+      <div id="loginError" class="error-box"></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Email or Username</label>
+          <input type="text" id="li_email" class="auth-input" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label>Password</label>
+          <input type="password" id="li_password" class="auth-input" placeholder="Enter your password" required>
+        </div>
+        <div style="text-align: right; margin-bottom: 16px;">
+          <a href="#" onclick="switchAuth('forgot')" style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn-auth">Login</button>
+      </form>
+      <div class="auth-footer">
+        Don't have an account? <a href="#" onclick="switchAuth('signup')">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="signupModal" class="modal-overlay">
+    <div class="auth-card">
+      <i class="fas fa-times modal-close" onclick="closeAuthModal()"></i>
+      <div class="auth-header">
+        <img src="/assets/logo.png" alt="Logo">
+        <h2>Join the Community</h2>
+      </div>
+      <div id="signupError" class="error-box"></div>
+      <form id="signupForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="su_fullname" class="auth-input" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="su_email" class="auth-input" placeholder="email@university.edu" required>
+        </div>
+        <div class="form-group">
+          <label>Institution / University</label>
+          <input type="text" id="su_institution" class="auth-input" placeholder="e.g. FAST NUCES, Punjab College" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="su_password" class="auth-input" placeholder="Min 8 chars, 1 uppercase, 1 symbol" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="su_confirm_password" class="auth-input" placeholder="Repeat your password" required>
+        </div>
+        <button type="submit" class="btn-auth">Create Account</button>
+      </form>
+      <div class="auth-footer">
+        Already have an account? <a href="#" onclick="switchAuth('login')">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="forgotModal" class="modal-overlay">
+    <div class="auth-card">
+      <i class="fas fa-times modal-close" onclick="closeAuthModal()"></i>
+      <div class="auth-header">
+        <img src="/assets/logo.png" alt="Logo">
+        <h2>Reset Password</h2>
+      </div>
+      
+      <!-- Step 1: Email Input -->
+      <div id="forgotStep1">
+        <div id="forgotError1" class="error-box"></div>
+        <div id="forgotSuccess1" class="success-box"></div>
+        <form id="forgotEmailForm">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="fp_email" class="auth-input" placeholder="Enter your registered email" required>
+          </div>
+          <button type="submit" class="btn-auth">Send OTP</button>
+        </form>
+        <div class="auth-footer">
+          Remember your password? <a href="#" onclick="switchAuth('login')">Login</a>
+        </div>
+      </div>
+
+      <!-- Step 2: OTP Verification -->
+      <div id="forgotStep2" style="display: none;">
+        <div id="forgotError2" class="error-box"></div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">We've sent a 6-digit code to your email</p>
+        <form id="forgotOtpForm">
+          <div class="form-group">
+            <label>Enter OTP</label>
+            <input type="text" id="fp_otp" class="auth-input" placeholder="Enter 6-digit OTP" maxlength="6" required>
+          </div>
+          <button type="submit" class="btn-auth">Verify OTP</button>
+        </form>
+        <div class="auth-footer">
+          <a href="#" onclick="resetForgotModal()" style="font-size: 13px;">Change Email</a>
+        </div>
+      </div>
+
+      <!-- Step 3: New Password -->
+      <div id="forgotStep3" style="display: none;">
+        <div id="forgotError3" class="error-box"></div>
+        <form id="forgotPasswordForm">
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="fp_new_password" class="auth-input" placeholder="Min 8 chars, 1 uppercase, 1 symbol" required>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="fp_confirm_password" class="auth-input" placeholder="Repeat new password" required>
+          </div>
+          <button type="submit" class="btn-auth">Reset Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    let userFavoriteIds = [];
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function getTimeAgo(dateString) {
+      const now = new Date();
+      const posted = new Date(dateString);
+      const diffMs = now - posted;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 60) return diffMins <= 1 ? 'Just now' : `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return posted.toLocaleDateString();
+    }
+
+    async function fetchUserFavorites() {
+      try {
+        const res = await fetch('/api/favorites/check');
+        const data = await res.json();
+        if (data.success) userFavoriteIds = data.favoriteIds || [];
+      } catch (e) {}
+    }
+
+    function renderItemsGrid(items) {
+      const grid = document.getElementById('itemsGrid');
+      if (!grid) return;
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 80px 0;">
+            <i class="fas fa-search" style="font-size: 48px; color: var(--border-light); margin-bottom: 16px;"></i>
+            <h3 style="color: var(--text-muted);">No items found</h3>
+            <p style="color: var(--text-light);">Try adjusting your filters or search terms.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(i => {
+        const img = (Array.isArray(i.images) && i.images[0]) || '';
+        const price = Number(i.price || 0).toLocaleString();
+        const isFav = userFavoriteIds.includes(i.id);
+        
+        return `
+          <div class="item-card" onclick="if(!event.target.closest('.fav-btn')) window.location.href='/item-detail.html?id=${i.id}'">
+            <div class="item-img-wrap">
+              ${img ? `<img src="${img}" alt="${escapeHtml(i.title)}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:#ddd;"><i class="fas fa-camera"></i></div>'}
+              <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, ${i.id})">
+                <i class="${isFav ? 'fas fa-heart' : 'far fa-heart'}"></i>
+              </button>
+            </div>
+            <div class="item-info">
+              <div class="item-price">Rs ${price}</div>
+              <div class="item-title">${escapeHtml(i.title)}</div>
+              <div class="item-location-date">
+                <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(i.city || 'Pakistan')}</span>
+                <span>${getTimeAgo(i.datePosted)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleFavorite(event, itemId) {
+      event.preventDefault(); event.stopPropagation();
+      const btn = event.currentTarget;
+      const isCurrentlyFav = btn.classList.contains('active');
+      try {
+        const url = isCurrentlyFav ? `/api/favorites/${itemId}` : '/api/favorites';
+        const method = isCurrentlyFav ? 'DELETE' : 'POST';
+        const r = await fetch(url, { 
+          method, headers: {'Content-Type':'application/json'},
+          body: isCurrentlyFav ? null : JSON.stringify({ item_id: itemId })
+        });
+        if ((await r.json()).success) {
+          btn.classList.toggle('active');
+          btn.querySelector('i').className = btn.classList.contains('active') ? 'fas fa-heart' : 'far fa-heart';
+        } else if (r.status === 401) {
+          openAuthModal('login');
+        }
+      } catch (e) {}
+    }
+
+    // Modal Logic
+    function openAuthModal(mode) {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      document.getElementById(mode + 'Modal').classList.add('active');
+    }
+    function closeAuthModal() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    }
+    function switchAuth(mode) { openAuthModal(mode); }
+    window.openModal = openAuthModal; // Export to navbar.js
+
+    // Forgot Password State
+    let forgotPasswordEmail = '';
+
+    function resetForgotModal() {
+      document.getElementById('forgotStep1').style.display = 'block';
+      document.getElementById('forgotStep2').style.display = 'none';
+      document.getElementById('forgotStep3').style.display = 'none';
+      document.getElementById('forgotEmailForm').reset();
+      document.getElementById('forgotOtpForm').reset();
+      document.getElementById('forgotPasswordForm').reset();
+      document.querySelectorAll('#forgotModal .error-box, #forgotModal .success-box').forEach(el => {
+        el.style.display = 'none';
+        el.textContent = '';
+      });
+      forgotPasswordEmail = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('mode') === 'login') openAuthModal('login');
+      if (urlParams.get('mode') === 'signup') openAuthModal('signup');
+
+      await fetchUserFavorites();
+      if (window.initFilters) {
+        window.initFilters('filterMount', '', renderItemsGrid);
+      }
+    });
+
+    // Auth Forms
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('li_email').value;
+      const password = document.getElementById('li_password').value;
+      const errorBox = document.getElementById('loginError');
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) location.href = '/home.html';
+        else { errorBox.textContent = data.error; errorBox.style.display = 'block'; }
+      } catch (e) { errorBox.textContent = 'Server error'; errorBox.style.display = 'block'; }
+    };
+
+    document.getElementById('signupForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const full_name = document.getElementById('su_fullname').value;
+      const email = document.getElementById('su_email').value;
+      const institution = document.getElementById('su_institution').value;
+      const password = document.getElementById('su_password').value;
+      const confirm_password = document.getElementById('su_confirm_password').value;
+      const errorBox = document.getElementById('signupError');
+      
+      errorBox.style.display = 'none';
+
+      // Validation
+      if (password !== confirm_password) {
+        errorBox.textContent = 'Passwords do not match.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      const strong = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+      if (!strong) {
+        errorBox.textContent = 'Password must be at least 8 chars with uppercase, lowercase, number, and symbol.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name, email, university: institution, password })
+        });
+        const data = await res.json();
+        if (data.success) { alert('Account created! Please login.'); switchAuth('login'); }
+        else { errorBox.textContent = data.error; errorBox.style.display = 'block'; }
+      } catch (e) { errorBox.textContent = 'Server error'; errorBox.style.display = 'block'; }
+    };
+
+    // Forgot Password Flow
+    document.getElementById('forgotEmailForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('fp_email').value;
+      const errorBox = document.getElementById('forgotError1');
+      const successBox = document.getElementById('forgotSuccess1');
+      
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.success) {
+          forgotPasswordEmail = email;
+          successBox.textContent = 'OTP sent! Check your email.';
+          successBox.style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('forgotStep1').style.display = 'none';
+            document.getElementById('forgotStep2').style.display = 'block';
+          }, 1000);
+        } else {
+          errorBox.textContent = data.message || 'Failed to send OTP';
+          errorBox.style.display = 'block';
+        }
+      } catch (e) { errorBox.textContent = 'Server error'; errorBox.style.display = 'block'; }
+    };
+
+    document.getElementById('forgotOtpForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const otp = document.getElementById('fp_otp').value;
+      const errorBox = document.getElementById('forgotError2');
+      
+      errorBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotPasswordEmail, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('forgotStep2').style.display = 'none';
+          document.getElementById('forgotStep3').style.display = 'block';
+        } else {
+          errorBox.textContent = data.message || 'Invalid OTP';
+          errorBox.style.display = 'block';
+        }
+      } catch (e) { errorBox.textContent = 'Server error'; errorBox.style.display = 'block'; }
+    };
+
+    document.getElementById('forgotPasswordForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById('fp_new_password').value;
+      const confirmPassword = document.getElementById('fp_confirm_password').value;
+      const errorBox = document.getElementById('forgotError3');
+      
+      errorBox.style.display = 'none';
+
+      if (newPassword !== confirmPassword) {
+        errorBox.textContent = 'Passwords do not match.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      const strong = newPassword.length >= 8 && /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword);
+      if (!strong) {
+        errorBox.textContent = 'Password must be at least 8 chars with uppercase and lowercase.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const otp = document.getElementById('fp_otp').value;
+        const res = await fetch('/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotPasswordEmail, otp, newPassword })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Password reset successful! Please login.');
+          closeAuthModal();
+          resetForgotModal();
+          switchAuth('login');
+        } else {
+          errorBox.textContent = data.message || 'Failed to reset password';
+          errorBox.style.display = 'block';
+        }
+      } catch (e) { errorBox.textContent = 'Server error'; errorBox.style.display = 'block'; }
+    };
+  </script>
+</body>
+</html>

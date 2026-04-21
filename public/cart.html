@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Cart — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .cart-container { margin: 40px auto; padding-bottom: 80px; }
+    
+    .cart-header { margin-bottom: 32px; }
+    .cart-header h1 { font-size: 28px; margin-bottom: 8px; }
+    .cart-header p { color: var(--text-muted); }
+
+    .cart-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .cart-items { display: flex; flex-direction: column; gap: 16px; }
+
+    .cart-card {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      padding: 16px;
+      display: flex;
+      gap: 20px;
+      transition: var(--transition);
+    }
+
+    .cart-card:hover { box-shadow: var(--shadow-md); }
+
+    .cart-img {
+      width: 140px;
+      height: 120px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f8f9fa;
+    }
+
+    .cart-info { flex: 1; min-width: 0; }
+    .cart-price { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .cart-title { font-size: 16px; color: var(--text-muted); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    .cart-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-light); }
+    .cart-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .cart-actions { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+
+    .btn-action {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      width: 160px;
+    }
+
+    .btn-chat { background: var(--primary); color: white; }
+    .btn-chat:hover { background: #003d43; }
+    .btn-remove { background: white; border-color: var(--border-light); color: #ff5a5f; }
+    .btn-remove:hover { border-color: #ff5a5f; background: #fff5f5; }
+
+    /* Summary Card */
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      padding: 24px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .summary-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
+    .summary-total { margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--bg-main); font-weight: 800; font-size: 20px; color: var(--primary); }
+
+    .empty-cart {
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .cart-grid { grid-template-columns: 1fr; }
+      .summary-card { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="container cart-container">
+    <div class="cart-header">
+      <h1>My Shopping Cart</h1>
+      <p id="itemCountLabel">0 items in your cart</p>
+    </div>
+
+    <div id="cartContent" class="cart-grid" style="display:none;">
+      <div class="cart-items" id="cartList"></div>
+      
+      <aside class="summary-card">
+        <div class="summary-title">Order Summary</div>
+        <div class="summary-row">
+          <span>Total Items</span>
+          <span id="sumCount">0</span>
+        </div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="sumSubtotal">Rs 0</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total Amount</span>
+          <span id="sumTotal">Rs 0</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%; margin-top:24px; padding:16px;" onclick="location.href='/checkout.html'">Proceed to Checkout</button>
+      </aside>
+    </div>
+
+    <div id="emptyState" class="empty-cart" style="display:none;">
+      <i class="fas fa-shopping-basket" style="font-size:64px; color:var(--border-light); margin-bottom:24px;"></i>
+      <h3>Your cart is empty</h3>
+      <p style="margin-bottom:24px;">Looks like you haven't added anything to your cart yet.</p>
+      <a href="/home.html" class="btn btn-primary">Start Shopping</a>
+    </div>
+  </main>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    
+    async function loadCart() {
+      try {
+        const r = await fetch('/api/cart');
+        const d = await r.json();
+        if(!d.success) return;
+
+        const items = d.items || [];
+        const count = items.length;
+
+        document.getElementById('itemCountLabel').textContent = `${count} item${count===1?'':'s'} in your cart`;
+
+        if(count === 0) {
+          document.getElementById('cartContent').style.display = 'none';
+          document.getElementById('emptyState').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('cartContent').style.display = 'grid';
+
+        let total = 0;
+        document.getElementById('cartList').innerHTML = items.map(item => {
+          const img = (item.images && item.images.length) ? item.images[0] : '';
+          const price = Number(item.price || 0);
+          total += price;
+          
+          return `
+            <div class="cart-card" id="item-${item.id}">
+              <img src="${esc(img)}" class="cart-img" onerror="this.src='/assets/placeholder.jpg'">
+              <div class="cart-info">
+                <div class="cart-price">Rs ${price.toLocaleString()}</div>
+                <div class="cart-title">${esc(item.title)}</div>
+                <div class="cart-meta">
+                  <span><i class="fas fa-user"></i> ${esc(item.sellerName)}</span>
+                  <span><i class="fas fa-map-marker-alt"></i> ${esc(item.city)}</span>
+                </div>
+              </div>
+              <div class="cart-actions">
+                <button class="btn-action btn-chat" onclick="location.href='/my-chats.html?to=${item.sellerId}&item=${item.id}'">
+                  <i class="fas fa-comments"></i> Chat
+                </button>
+                <button class="btn-action btn-remove" onclick="removeItem(${item.id})">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('sumCount').textContent = count;
+        document.getElementById('sumSubtotal').textContent = `Rs ${total.toLocaleString()}`;
+        document.getElementById('sumTotal').textContent = `Rs ${total.toLocaleString()}`;
+
+      } catch(e) {}
+    }
+
+    async function removeItem(id) {
+      if(!confirm('Remove this item from your cart?')) return;
+      try {
+        const r = await fetch(`/api/cart/${id}`, { method: 'DELETE' });
+        if((await r.json()).success) {
+          document.getElementById(`item-${id}`).style.opacity = '0.5';
+          loadCart();
+        }
+      } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCart);
+  </script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Item Details — Kitaab Faroosh</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/global.css" />
+  <style>
+    .detail-container { margin: 32px auto; padding-bottom: 80px; }
+    
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Left Side: Images & Description */
+    .image-card {
+      background: var(--white);
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .main-img-box {
+      width: 100%;
+      height: 480px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-img-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .img-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      opacity: 0;
+    }
+
+    .main-img-box:hover .img-nav-btn { opacity: 1; }
+    .img-nav-btn:hover { background: white; transform: translateY(-50%) scale(1.1); }
+    .img-nav-btn.prev { left: 16px; }
+    .img-nav-btn.next { right: 16px; }
+
+    .thumb-strip {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .thumb-item {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .thumb-item.active { border-color: var(--secondary); }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .content-card {
+      background: var(--white);
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .content-card h3 { margin-bottom: 16px; font-size: 20px; }
+    .content-card p { line-height: 1.7; color: var(--text-muted); white-space: pre-wrap; }
+
+    /* Right Side: Info & Actions */
+    .price-card {
+      background: var(--white);
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .price-tag { font-size: 36px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .title-tag { font-size: 20px; color: var(--text-muted); margin-bottom: 16px; }
+    
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-top: 1px solid var(--border-light);
+      font-size: 14px;
+    }
+
+    .meta-label { color: var(--text-light); }
+    .meta-value { font-weight: 700; color: var(--primary); }
+
+    .seller-card {
+      background: var(--white);
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .seller-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .seller-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #eee; }
+    .seller-name { font-size: 18px; font-weight: 800; color: var(--primary); }
+    .seller-joined { font-size: 12px; color: var(--text-light); }
+
+    .action-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+      border: none;
+    }
+
+    .btn-chat { background: var(--primary); color: white; }
+    .btn-chat:hover { background: #003d43; }
+    .btn-cart { background: var(--secondary); color: white; }
+    .btn-cart:hover { background: #008f8a; }
+    .btn-cart:disabled { background: #ccc; cursor: not-allowed; }
+
+    .reveal-btn {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .safety-card {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 4px;
+      padding: 20px;
+    }
+
+    .safety-card h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 16px; }
+
+    @media (max-width: 900px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .main-img-box { height: 320px; }
+    }
+  </style>
+</head>
+<body>
+  <script src="/js/navbar.js" defer></script>
+
+  <main class="container detail-container">
+    <a href="javascript:history.back()" style="display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; font-weight:700; color:var(--primary);">
+      <i class="fas fa-arrow-left"></i> Back to results
+    </a>
+
+    <div id="itemDetail">
+      <!-- Loading Skeleton -->
+      <div class="text-center" style="padding: 100px 0;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: var(--secondary);"></i>
+        <h3 style="margin-top: 20px;">Loading item details...</h3>
+      </div>
+    </div>
+  </main>
+
+  <div id="main-footer-placeholder"></div>
+  <script src="/js/footer.js" defer></script>
+
+  <script>
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    
+    function timeAgo(d){
+      const now=new Date(), p=new Date(d), ms=now-p, m=Math.floor(ms/60000);
+      if(m<60) return m<=1?'Just now':`${m}m ago`;
+      const h=Math.floor(m/60); if(h<24) return`${h}h ago`;
+      const days=Math.floor(h/24); if(days<30) return`${days}d ago`;
+      return p.toLocaleDateString();
+    }
+
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const itemId = params.get('id');
+      if (!itemId) {
+        document.getElementById('itemDetail').innerHTML = '<div class="content-card text-center"><h2>Item Not Found</h2><p>Invalid URL parameters.</p></div>';
+        return;
+      }
+
+      let item = null, seller = null, loggedIn = false, isFav = false, isInCart = false, myId = null;
+      try {
+        const [itemRes, sessionRes] = await Promise.all([
+          fetch(`/api/item/${itemId}`),
+          fetch('/session')
+        ]);
+        const itemData = await itemRes.json();
+        const sessionData = await sessionRes.json();
+        loggedIn = sessionData.loggedIn;
+        myId = loggedIn ? sessionData.user.id : null;
+
+        if (!itemData.success) {
+          document.getElementById('itemDetail').innerHTML = `<div class="content-card text-center"><h2>Item Not Found</h2><p>${esc(itemData.error)}</p></div>`;
+          return;
+        }
+        item = itemData.item;
+
+        const promises = [];
+        if (item.sellerId) promises.push(fetch(`/api/users/${item.sellerId}/public`).then(r=>r.json()));
+        else promises.push(Promise.resolve(null));
+        if (loggedIn) {
+          promises.push(fetch('/api/favorites/check').then(r=>r.json()));
+          promises.push(fetch('/api/cart/check').then(r=>r.json()));
+        }
+
+        const [sellerData, favData, cartData] = await Promise.all(promises);
+        if (sellerData && sellerData.success) seller = sellerData.user;
+        if (favData && favData.success) isFav = (favData.favoriteIds || []).includes(item.id);
+        if (cartData && cartData.success) isInCart = (cartData.cartIds || []).includes(item.id);
+
+      } catch(e) { console.error(e); }
+
+      const images = Array.isArray(item.images) && item.images.length > 0 ? item.images : [];
+      const mainImg = images[0] || '';
+      const priceStr = item.price ? `Rs ${Number(item.price).toLocaleString()}` : 'Contact for price';
+      const sellerAvatar = (seller && seller.profile_pic) || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(item.sellerName)}`;
+
+      let html = `<div class="detail-grid">
+        <!-- Left: Image Gallery & Description -->
+        <div>
+          <div class="image-card">
+            <div class="main-img-box">
+              ${mainImg ? `<img src="${esc(mainImg)}" id="mainImgEl">` : '<i class="fas fa-camera" style="font-size:80px; color:#eee;"></i>'}
+              ${images.length > 1 ? `
+                <button class="img-nav-btn prev" id="imgPrev"><i class="fas fa-chevron-left"></i></button>
+                <button class="img-nav-btn next" id="imgNext"><i class="fas fa-chevron-right"></i></button>
+              ` : ''}
+              <button class="fav-btn ${isFav?'active':''}" id="favBtn" style="position:absolute; top:20px; right:20px; width:44px; height:44px; font-size:20px; background:white; border-radius:50%; border:none; box-shadow:var(--shadow-md); cursor:pointer; color:${isFav?'#ff5a5f':'#999'}">
+                <i class="${isFav?'fas':'far'} fa-heart"></i>
+              </button>
+            </div>
+            ${images.length > 1 ? `
+              <div class="thumb-strip">
+                ${images.map((img, i) => `
+                  <div class="thumb-item ${i===0?'active':''}" data-index="${i}">
+                    <img src="${esc(img)}">
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="content-card">
+            <h3 style="display:flex; align-items:center; gap:10px; color:var(--primary);"><i class="fas fa-align-left"></i> Description</h3>
+            <p style="font-size:15px; color:#444;">${esc(item.description || 'No description provided.')}</p>
+          </div>
+
+          ${item.attributes && Object.keys(item.attributes).length > 0 ? `
+            <div class="content-card">
+              <h3 style="display:flex; align-items:center; gap:10px; color:var(--primary);"><i class="fas fa-list-ul"></i> Specifications</h3>
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+                ${Object.entries(item.attributes).map(([k, v]) => `
+                  <div class="spec-row" style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase; margin-bottom: 4px;">${esc(k.replace(/_/g, ' '))}</div>
+                    <div style="font-weight: 700; color: var(--primary); font-size: 14px;">${esc(v)}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Right: Pricing, Seller & Safety -->
+        <div>
+          <div class="price-card">
+            <div class="price-tag">${priceStr}</div>
+            <div class="title-tag">${esc(item.title)}</div>
+            
+            <div class="meta-row">
+              <span class="meta-label"><i class="fas fa-tag"></i> Category</span>
+              <span class="meta-value">${esc(item.category)}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label"><i class="fas fa-info-circle"></i> Condition</span>
+              <span class="meta-value">${esc(item.condition)}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label"><i class="fas fa-map-marker-alt"></i> Location</span>
+              <span class="meta-value">${esc(item.city)}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label"><i class="fas fa-clock"></i> Posted</span>
+              <span class="meta-value">${timeAgo(item.datePosted)}</span>
+            </div>
+          </div>
+
+          <div class="seller-card">
+            <div class="seller-header">
+              <img src="${sellerAvatar}" class="seller-avatar">
+              <div>
+                <div class="seller-name">${esc(item.sellerName)}</div>
+                <div class="seller-joined">Member since ${seller?.member_since ? new Date(seller.member_since).getFullYear() : '2026'}</div>
+              </div>
+              <a href="/profile.html?id=${item.sellerId}" style="margin-left:auto; color:var(--primary);"><i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <button class="action-btn btn-chat" id="chatBtn">
+              <i class="fas fa-comments"></i> Chat with Seller
+            </button>
+            <button class="action-btn reveal-btn" id="callBtn">
+              <i class="fas fa-phone"></i> <span id="phoneText">Show Contact Number</span>
+            </button>
+            <button class="action-btn btn-cart" id="cartBtn" ${isInCart?'disabled':''}>
+              <i class="fas fa-shopping-cart"></i> ${isInCart ? 'Already in Cart' : 'Add to Cart'}
+            </button>
+          </div>
+
+          <div class="safety-card">
+            <h4><i class="fas fa-shield-alt" style="color:#fbc02d;"></i> Safety Tips</h4>
+            <ul style="padding-left: 20px; font-size: 13px; color: #555;">
+              <li style="margin-bottom:8px;">Meet the seller in a public campus location.</li>
+              <li style="margin-bottom:8px;">Inspect the item thoroughly before paying.</li>
+              <li style="margin-bottom:8px;">Avoid sharing personal financial details.</li>
+              <li>Pay only after you have received the item.</li>
+            </ul>
+          </div>
+        </div>
+      </div>`;
+
+      document.getElementById('itemDetail').innerHTML = html;
+
+      // ---- Interactions ----
+      let currentIdx = 0;
+      function showImg(idx) {
+        if (images.length <= 1) return;
+        if (idx < 0) idx = images.length - 1;
+        if (idx >= images.length) idx = 0;
+        currentIdx = idx;
+        const el = document.getElementById('mainImgEl');
+        if (el) el.src = images[currentIdx];
+        document.querySelectorAll('.thumb-item').forEach((t,i) => t.classList.toggle('active', i === currentIdx));
+      }
+
+      if (images.length > 1) {
+        document.getElementById('imgPrev').onclick = () => showImg(currentIdx - 1);
+        document.getElementById('imgNext').onclick = () => showImg(currentIdx + 1);
+        document.querySelectorAll('.thumb-item').forEach(t => {
+          t.onclick = () => showImg(parseInt(t.dataset.index));
+        });
+      }
+
+      const favBtn = document.getElementById('favBtn');
+      favBtn.onclick = async () => {
+        if (!loggedIn) { alert('Please login to save favorites'); return; }
+        const isCurrentlyFav = favBtn.classList.contains('active');
+        try {
+          const url = isCurrentlyFav ? `/api/favorites/${item.id}` : '/api/favorites';
+          const method = isCurrentlyFav ? 'DELETE' : 'POST';
+          const r = await fetch(url, {
+            method,
+            headers: {'Content-Type':'application/json'},
+            body: isCurrentlyFav ? null : JSON.stringify({ item_id: item.id })
+          });
+          if ((await r.json()).success) {
+            favBtn.classList.toggle('active');
+            favBtn.style.color = favBtn.classList.contains('active') ? '#ff5a5f' : '#999';
+            favBtn.querySelector('i').className = favBtn.classList.contains('active') ? 'fas fa-heart' : 'far fa-heart';
+          }
+        } catch(e) {}
+      };
+
+      document.getElementById('callBtn').onclick = () => {
+        const phone = item.phone_number || 'Not provided';
+        document.getElementById('phoneText').textContent = phone;
+      };
+
+      document.getElementById('chatBtn').onclick = () => {
+        if (!loggedIn) { alert('Please login to chat'); return; }
+        if (myId === item.sellerId) { alert("This is your own ad!"); return; }
+        location.href = `/my-chats.html?to=${item.sellerId}&item=${item.id}`;
+      };
+
+      const cartBtn = document.getElementById('cartBtn');
+      cartBtn.onclick = async () => {
+        if (!loggedIn) { alert('Please login to use cart'); return; }
+        if (myId === item.sellerId) { alert("You can't buy your own item!"); return; }
+        cartBtn.disabled = true;
+        try {
+          const r = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ itemId: item.id })
+          });
+          if ((await r.json()).success) {
+            cartBtn.textContent = 'Already in Cart';
+            if(window.showToast) window.showToast('Added to cart!', '🛒');
+          } else {
+            cartBtn.disabled = false;
+          }
+        } catch(e) { cartBtn.disabled = false; }
+      };
+
+    })();
+  </script>
+</body>
+</html>
